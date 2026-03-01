@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Sidebar } from '@/components/Sidebar'
 import { Player } from '@/components/Player'
+import { AudioEngine } from '@/components/AudioEngine'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -34,6 +35,9 @@ export default function RootLayout({
         <div className="absolute bottom-0 left-0 w-full z-50">
           <Player />
         </div>
+
+        {/* Invisible Audio Engine */}
+        <AudioEngine />
       </body>
     </html>
   )

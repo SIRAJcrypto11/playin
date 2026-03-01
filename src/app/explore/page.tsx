@@ -1,5 +1,7 @@
-import { TrackCard, TrackCardSkeleton } from '@/components/TrackCard'
 import { getTrendingMusic } from '@/lib/api'
+import { ExploreClientHandler } from './ExploreClientHandler'
+
+export const revalidate = 3600
 
 export default async function ExplorePage() {
     const trendingTracks = await getTrendingMusic()
@@ -30,20 +32,7 @@ export default async function ExplorePage() {
 
             <section>
                 <h2 className="text-2xl font-bold mb-6">Trending Now</h2>
-
-                {trendingTracks.length === 0 ? (
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-                        {Array.from({ length: 12 }).map((_, i) => (
-                            <TrackCardSkeleton key={i} />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-                        {trendingTracks.map((track) => (
-                            <TrackCard key={track.videoId} track={track} />
-                        ))}
-                    </div>
-                )}
+                <ExploreClientHandler tracks={trendingTracks} />
             </section>
         </div>
     )
