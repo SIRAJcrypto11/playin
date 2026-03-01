@@ -3,6 +3,8 @@ import { getUserPlaylists } from '@/lib/actions'
 import { LibraryClient } from './LibraryClient'
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 export default async function LibraryPage() {
     const session = await auth()
 

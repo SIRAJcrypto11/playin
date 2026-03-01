@@ -3,12 +3,13 @@
 import ReactPlayer from 'react-player'
 import { usePlayerStore } from '@/store/usePlayerStore'
 import { useEffect, useRef, useState } from 'react'
-import type { ReactPlayerProps } from 'react-player/types/lib'
+
+const Player: any = ReactPlayer
 
 export function AudioEngine() {
     const { currentTrack, isPlaying, volume, next, setProgress, setDuration } = usePlayerStore()
     const [hasWindow, setHasWindow] = useState(false)
-    const playerRef = useRef<ReactPlayer>(null)
+    const playerRef = useRef<any>(null)
 
     useEffect(() => {
         setHasWindow(true)
@@ -18,20 +19,20 @@ export function AudioEngine() {
 
     return (
         <div className="hidden">
-            <ReactPlayer
+            <Player
                 ref={playerRef}
                 url={`https://www.youtube.com/watch?v=${currentTrack.videoId}`}
                 playing={isPlaying}
                 volume={volume}
                 onEnded={next}
-                onProgress={(state: { playedSeconds: number }) => setProgress(state.playedSeconds)}
-                onDuration={(duration: number) => setDuration(duration)}
+                onProgress={(state: any) => setProgress(state.playedSeconds)}
+                onDuration={(duration: any) => setDuration(duration)}
                 width="0"
                 height="0"
                 config={{
                     youtube: {
                         playerVars: { showinfo: 0, autoPlay: 1, controls: 0 }
-                    }
+                    } as any
                 }}
             />
         </div>

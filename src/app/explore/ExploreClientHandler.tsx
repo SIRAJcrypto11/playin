@@ -3,9 +3,9 @@
 import { TrackCard, TrackCardSkeleton } from '@/components/TrackCard'
 import { usePlayerStore } from '@/store/usePlayerStore'
 import type { Track } from '@/lib/api'
-import { motion } from 'framer-motion'
+import { motion, type Variants } from 'framer-motion'
 
-const containerVars = {
+const containerVars: Variants = {
     hidden: { opacity: 0 },
     show: {
         opacity: 1,
@@ -13,7 +13,7 @@ const containerVars = {
     }
 }
 
-const itemVars = {
+const itemVars: Variants = {
     hidden: { opacity: 0, scale: 0.95, y: 15 },
     show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', bounce: 0.4 } }
 }
