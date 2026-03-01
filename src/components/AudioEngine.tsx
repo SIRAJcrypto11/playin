@@ -38,7 +38,7 @@ export function AudioEngine() {
         <div className="hidden">
             <Player
                 ref={playerRef}
-                url={`https://www.youtube.com/watch?v=${currentTrack.videoId}`}
+                url={currentTrack.isLocal ? currentTrack.url : `https://www.youtube.com/watch?v=${currentTrack.videoId}`}
                 playing={isPlaying}
                 volume={volume}
                 onEnded={next}
@@ -57,7 +57,13 @@ export function AudioEngine() {
                             modestbranding: 1,
                             rel: 0
                         }
-                    } as any
+                    } as any,
+                    file: {
+                        forceAudio: true,
+                        attributes: {
+                            controlsList: 'nodownload'
+                        }
+                    }
                 }}
             />
         </div>

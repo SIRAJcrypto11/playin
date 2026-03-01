@@ -56,7 +56,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         const { currentTrack, queue } = get()
         if (!currentTrack || queue.length === 0) return
 
-        const currentIndex = queue.findIndex(t => t.videoId === currentTrack.videoId)
+        const currentIndex = queue.findIndex(t =>
+            t.videoId ? t.videoId === currentTrack.videoId : t.url === currentTrack.url
+        )
         if (currentIndex !== -1 && currentIndex < queue.length - 1) {
             const nextTrack = queue[currentIndex + 1]
             set({ currentTrack: nextTrack, progress: 0, isPlaying: true, duration: nextTrack.duration })
@@ -73,7 +75,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
             return
         }
 
-        const currentIndex = queue.findIndex(t => t.videoId === currentTrack.videoId)
+        const currentIndex = queue.findIndex(t =>
+            t.videoId ? t.videoId === currentTrack.videoId : t.url === currentTrack.url
+        )
         if (currentIndex > 0) {
             const prevTrack = queue[currentIndex - 1]
             set({ currentTrack: prevTrack, progress: 0, isPlaying: true, duration: prevTrack.duration })

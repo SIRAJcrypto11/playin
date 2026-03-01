@@ -39,7 +39,7 @@ export function TrackGrid({ tracks }: { tracks: Track[] }) {
             className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"
         >
             {tracks.map((track) => (
-                <motion.div key={track.videoId} variants={itemVars}>
+                <motion.div key={track.videoId || track.url} variants={itemVars}>
                     <TrackCard
                         track={track}
                         onClick={(t) => playTrack(t, tracks)}

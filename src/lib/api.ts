@@ -30,13 +30,15 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 export interface Track {
-    videoId: string
+    videoId?: string
     title: string
     uploaderName: string
     uploaderUrl: string
     thumbnail: string
     duration: number
     views: number
+    url?: string // Optional URL for local files
+    isLocal?: boolean // Flag for local files
 }
 
 async function fetchWithFailover(endpoint: string, options?: RequestInit): Promise<any> {

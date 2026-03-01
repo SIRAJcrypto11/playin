@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Home, Compass, Library } from 'lucide-react'
+import { LocalFilePicker } from './LocalFilePicker'
 
 export function Sidebar() {
     return (
@@ -32,6 +33,13 @@ export function Sidebar() {
                     Library
                 </Link>
             </nav>
+
+            <div className="mt-8 px-1">
+                <p className="mb-4 px-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                    Local Files
+                </p>
+                <LocalFilePicker />
+            </div>
             {/* Scrollable playlist list later goes here */}
         </aside>
     )
