@@ -18,7 +18,7 @@ const itemVars: Variants = {
     show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', bounce: 0.4 } }
 }
 
-export function ExploreClientHandler({ tracks }: { tracks: Track[] }) {
+export function TrackGrid({ tracks }: { tracks: Track[] }) {
     const { playTrack } = usePlayerStore()
 
     if (!tracks || tracks.length === 0) {

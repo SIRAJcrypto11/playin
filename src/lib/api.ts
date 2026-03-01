@@ -1,9 +1,15 @@
 /**
  * Client API for fetching music utilizing public Piped instances
- * Fallback to standard mock if Piped API instance is down
+ * Robust multi-instance support with auto-failover
  */
 
-const PIPED_API_URL = 'https://pipedapi.kavin.rocks'
+const PIPED_INSTANCES = [
+    'https://pipedapi.kavin.rocks',
+    'https://api.piped.victr.me',
+    'https://piped-api.lunar.icu',
+    'https://api-piped.mha.fi',
+    'https://pipedapi.berrytube.tv'
+]
 
 export interface Track {
     videoId: string
@@ -15,16 +21,37 @@ export interface Track {
     views: number
 }
 
+async function fetchWithFailover(endpoint: string, options?: RequestInit): Promise<any> {
+    let lastError = null;
+
+    for (const instance of PIPED_INSTANCES) {
+        try {
+            const res = await fetch(`${instance}${endpoint}`, {
+                ...options,
+                signal: AbortSignal.timeout(5000) // 5s timeout per instance
+            });
+
+            if (res.ok) {
+                return await res.json();
+            }
+
+            console.warn(`Instance ${instance} returned status ${res.status}`);
+        } catch (error) {
+            console.warn(`Failed to fetch from ${instance}:`, error);
+            lastError = error;
+        }
+    }
+
+    throw lastError || new Error('All Piped instances failed');
+}
+
 export async function searchMusic(query: string): Promise<Track[]> {
     try {
-        const res = await fetch(`${PIPED_API_URL}/search?q=${encodeURIComponent(query)}&filter=music_songs`, {
-            next: { revalidate: 3600 } // cache for 1 hour
-        })
+        const data = await fetchWithFailover(`/search?q=${encodeURIComponent(query)}&filter=music_songs`, {
+            next: { revalidate: 3600 }
+        });
 
-        if (!res.ok) throw new Error('Failed to fetch from Piped API')
-
-        const data = await res.json()
-        return data.items
+        return (data.items || [])
             .filter((item: any) => item.type === 'stream')
             .map((item: any) => ({
                 videoId: item.url.split('/watch?v=')[1],
@@ -34,24 +61,20 @@ export async function searchMusic(query: string): Promise<Track[]> {
                 thumbnail: item.thumbnail,
                 duration: item.duration,
                 views: item.views,
-            }))
+            }));
     } catch (error) {
-        console.error("Search error:", error)
-        return []
+        console.error("Search error after all retries:", error);
+        return [];
     }
 }
 
 export async function getTrendingMusic(): Promise<Track[]> {
     try {
-        // Trending music endpoints might vary, using a generic music search as an alternative
-        const res = await fetch(`${PIPED_API_URL}/trending?region=US`, {
+        const data = await fetchWithFailover('/trending?region=US', {
             next: { revalidate: 3600 }
-        })
+        });
 
-        if (!res.ok) throw new Error('Failed to fetch trending from Piped API')
-
-        const data = await res.json()
-        return data
+        return (data || [])
             .filter((item: any) => item.type === 'stream')
             .slice(0, 24)
             .map((item: any) => ({
@@ -62,9 +85,9 @@ export async function getTrendingMusic(): Promise<Track[]> {
                 thumbnail: item.thumbnail,
                 duration: item.duration,
                 views: item.views,
-            }))
+            }));
     } catch (error) {
-        console.error("Trending error:", error)
-        return []
+        console.error("Trending error after all retries:", error);
+        return [];
     }
 }
