@@ -1,15 +1,33 @@
 /**
  * Client API for fetching music utilizing public Piped instances
- * Robust multi-instance support with auto-failover
+ * Ultra-robust multi-instance support with auto-failover and load distribution (shuffling)
  */
 
 const PIPED_INSTANCES = [
     'https://pipedapi.kavin.rocks',
     'https://api.piped.victr.me',
-    'https://piped-api.lunar.icu',
+    'https://pipedapi.privacydev.net',
     'https://api-piped.mha.fi',
-    'https://pipedapi.berrytube.tv'
+    'https://pipedapi.berrytube.tv',
+    'https://pipedapi.astartes.nl',
+    'https://pipedapi.hostux.net',
+    'https://pipedapi.ramble.moe',
+    'https://pipedapi.moomoo.me',
+    'https://pipedapi.syndr.me',
+    'https://api.piped.privacy.com.de'
 ]
+
+/**
+ * Shuffles an array in place (Fisher-Yates)
+ */
+function shuffleArray<T>(array: T[]): T[] {
+    const newArr = [...array];
+    for (let i = newArr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+    }
+    return newArr;
+}
 
 export interface Track {
     videoId: string
@@ -24,11 +42,15 @@ export interface Track {
 async function fetchWithFailover(endpoint: string, options?: RequestInit): Promise<any> {
     let lastError = null;
 
-    for (const instance of PIPED_INSTANCES) {
+    // Shuffle instances to distribute load and avoid synchronized rate-limiting
+    const shuffledInstances = shuffleArray(PIPED_INSTANCES);
+
+    for (const instance of shuffledInstances) {
         try {
             const res = await fetch(`${instance}${endpoint}`, {
                 ...options,
-                signal: AbortSignal.timeout(5000) // 5s timeout per instance
+                // Reduced timeout for faster failover (3-4s is better for snappy UI)
+                signal: AbortSignal.timeout(4000)
             });
 
             if (res.ok) {
